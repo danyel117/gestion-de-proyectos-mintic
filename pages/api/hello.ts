@@ -7,6 +7,7 @@ type Data = {
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   if (req.method === 'GET') {
+    console.log('esto es un código servidor');
     res.status(200).json({ name: 'HICE UN GET' });
   }
   if (req.method === 'POST') {
