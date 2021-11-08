@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Producto {
+  id         String      @id @default(cuid())
+  nombre     String
+  foto       String
+  inventario Inventario?
+}
+
+model Inventario {
+  id                   String                 @id @default(cuid())
+  cantidad             Int
+  producto             Producto               @relation(fields: [productoId], references: [id])
+  productoId           String                 @unique
+  movimientoInventario MovimientoInventario[]
+}
+
+enum Enum_TipoMovimiento {
+  Entrada
+  Salida
+}
+
+model MovimientoInventario {
+  id             String              @id @default(cuid())
+  inventario     Inventario          @relation(fields: [inventarioId], references: [id])
+  inventarioId   String
+  cantidad       Int
+  tipoMovimiento Enum_TipoMovimiento
+  fecha          DateTime
+  usuario        Usuario?            @relation(fields: [usuarioId], references: [id])
+  usuarioId      String?
+}
+
+model Usuario {
+  id          String                 @id @default(cuid())
+  nombre      String
+  correo      String                 @unique
+  movimientos MovimientoInventario[]
+}
