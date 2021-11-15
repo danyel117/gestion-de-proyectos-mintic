@@ -5,45 +5,106 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator typegraphql {
+  provider           = "typegraphql-prisma"
+  output             = "../prisma/generated/type-graphql"
+  emitTranspiledCode = true
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Producto {
-  id         String      @id @default(cuid())
-  nombre     String
-  foto       String
-  inventario Inventario?
+enum Enum_Rol {
+  Estudiante
+  Lider
+  Administrador
 }
 
-model Inventario {
-  id                   String                 @id @default(cuid())
-  cantidad             Int
-  producto             Producto               @relation(fields: [productoId], references: [id])
-  productoId           String                 @unique
-  movimientoInventario MovimientoInventario[]
+enum Enum_EstadoUsuario {
+  Pendiente
+  Autorizado
+  NoAutorizado
 }
 
-enum Enum_TipoMovimiento {
-  Entrada
-  Salida
+enum Enum_EstadoProyecto {
+  Activo
+  Inactivo
 }
 
-model MovimientoInventario {
-  id             String              @id @default(cuid())
-  inventario     Inventario          @relation(fields: [inventarioId], references: [id])
-  inventarioId   String
-  cantidad       Int
-  tipoMovimiento Enum_TipoMovimiento
-  fecha          DateTime
-  usuario        Usuario?            @relation(fields: [usuarioId], references: [id])
-  usuarioId      String?
+enum Enum_FaseProyecto {
+  Iniciado
+  Desarrollo
+  Terminado
+}
+
+enum Enum_TipoObjetivo {
+  General
+  Especifico
+}
+
+enum Enum_EstadoInscripcion {
+  Aceptada
+  Rechazada
 }
 
 model Usuario {
-  id          String                 @id @default(cuid())
-  nombre      String
-  correo      String                 @unique
-  movimientos MovimientoInventario[]
+  id                 String             @id @default(cuid())
+  correo             String             @unique
+  nombre             String
+  apellido           String
+  identificacion     String             @unique
+  telefono           String?
+  rol                Enum_Rol
+  estado             Enum_EstadoUsuario
+  proyectosLiderados Proyecto[]
+  avancesCreados     Avance[]
+  inscripciones      Inscripcion[]
+}
+
+model Proyecto {
+  id            String              @id @default(cuid())
+  nombre        String
+  descripcion   String              @default("sin descripcion")
+  presupuesto   Float
+  fechaInicio   DateTime
+  fechaFin      DateTime
+  lider         Usuario             @relation(fields: [usuarioId], references: [id])
+  usuarioId     String
+  estado        Enum_EstadoProyecto
+  fase          Enum_FaseProyecto
+  objetivos     Objetivo[]
+  avances       Avance[]
+  inscripciones Inscripcion[]
+}
+
+model Objetivo {
+  id          String            @id @default(cuid())
+  descripcion String
+  tipo        Enum_TipoObjetivo
+  proyecto    Proyecto          @relation(fields: [proyectoId], references: [id])
+  proyectoId  String
+}
+
+model Avance {
+  id            String   @id @default(cuid())
+  fecha         DateTime
+  descripcion   String
+  observaciones String
+  proyecto      Proyecto @relation(fields: [proyectoId], references: [id])
+  proyectoId    String
+  creadoPor     Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId     String
+}
+
+model Inscripcion {
+  id           String                 @id @default(cuid())
+  estado       Enum_EstadoInscripcion
+  fechaIngreso DateTime
+  fechaEgreso  DateTime
+  proyecto     Proyecto               @relation(fields: [proyectoId], references: [id])
+  proyectoId   String
+  estudiante   Usuario                @relation(fields: [usuarioId], references: [id])
+  usuarioId    String
 }

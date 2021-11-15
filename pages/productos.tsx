@@ -5,19 +5,20 @@ import { PrismaClient } from '.prisma/client';
 const prisma = new PrismaClient();
 
 export async function getServerSideProps() {
-  const productos = await prisma.producto.findMany({
-    include: {
-      inventario: {
-        include: {
-          movimientoInventario: {
-            include: {
-              usuario: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  // const productos = await prisma.producto.findMany({
+  //   include: {
+  //     inventario: {
+  //       include: {
+  //         movimientoInventario: {
+  //           include: {
+  //             usuario: true,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
+  const productos = [];
   return {
     props: { productos: JSON.parse(safeJsonStringify(productos)) }, // will be passed to the page component as props
   };
