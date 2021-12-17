@@ -5,6 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "build_generate": "npx prisma generate && yarn build",
     "lint": "next lint"
   },
   "dependencies": {
