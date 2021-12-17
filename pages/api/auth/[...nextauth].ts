@@ -2,7 +2,6 @@ import NextAuth from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
-import { Usuario } from 'prisma/generated/type-graphql';
 
 const prisma = new PrismaClient();
 
